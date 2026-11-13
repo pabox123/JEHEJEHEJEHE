@@ -10,3 +10,25 @@
 /httpRequests/
 .venv/
 .idea
+
+# GoEmotions Raw Data
+data/raw/*.tsv
+data/raw/*.csv
+data/raw/*.zip
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# OS
+.DS_Store
+Thumbs.db
