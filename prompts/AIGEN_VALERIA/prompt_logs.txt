@@ -1,0 +1,43 @@
+================================================================================
+INTERACTION #1: Sentiment Mapping and Filtering Logic
+Date: November 14, 2026
+Task: Implement official GoEmotions sentiment mapping and filter for binary classification
+================================================================================
+CONTEXT PROVIDED TO AI:
+- Dataset: GoEmotions (filtered version with 54,263 comments)
+- Task: Map 27 emotions to 3 sentiment groups (positive, negative, ambiguous)
+- Requirement: Keep ONLY comments where ALL emotions belong to the same group
+- Constraint: Remove neutral, ambiguous, and mixed-sentiment comments
+- Final goal: Balanced dataset of 500 positive + 500 negative comments
+PROMPT USED:
+"Write a Python function to filter comments where all emotions belong to the same
+sentiment group. Remove mixed, neutral, and ambiguous comments. Use the official
+GoEmotions mapping: positive (12 emotions), negative (11 emotions), ambiguous (4
+emotions), and neutral."
+AI OUTPUT SUMMARY:
+- Generated a basic filter that checked if at least one emotion was positive or negative
+- Failed to discard comments with emotions from BOTH groups (e.g., joy + anger)
+- Did not handle empty emotion_ids lists (caused KeyError)
+- Applied random sampling BEFORE filtering (incorrect order)
+MANUAL ADJUSTMENTS MADE:
+1. Logic correction: Rewrote the classification function to ensure ALL emotions
+   in a comment belong to the SAME group. The condition `len(set(sentiments)) == 1`
+   guarantees we only keep "pure" sentiments (not mixed).
+2. Edge case handling: Added explicit check to drop rows with empty `emotion_ids`
+   lists to prevent mapping errors and ensure data quality.
+3. Reproducibility fix: Ensured `random_state=42` is applied STRICTLY AFTER
+   filtering and deduplication, not before. This guarantees the exact same 500/500
+   split every time the code runs.
+4. Modular design: Split the logic into separate functions:
+   - `map_emotion_to_sentiment`: Maps single emotion ID to sentiment group
+   - `classify_comment_sentiment`: Classifies entire comment based on all emotions
+   - `filter_goemotions_for_binary_classification`: Applies filtering pipeline
+   - `create_balanced_binary_dataset`: Samples exactly 500 per class
+5. Validation: Added test cases in __main__ block to verify mixed sentiments are
+   correctly labeled as 'mixed' and discarded.
+FINAL IMPLEMENTATION:
+- File: src/preprocessing.py (functions added at the end)
+- Key functions: classify_comment_sentiment, filter_goemotions_for_binary_classification,
+  create_balanced_binary_dataset, load_and_prepare_goemotions
+- Validated with test cases showing correct handling of mixed, ambiguous, and neutral
+================================================================================
