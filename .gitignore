@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Local environments
+.venv/
+venv/
+env/
+
+# Trained models and checkpoints
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+outputs/saved_models/*
+!outputs/saved_models/.gitkeep
+outputs/saved_models/*.pt
+*.pt
+outputs/saved_models/*.pt
+*.pt
+*.pt
+outputs/saved_models/
+*.pt
+outputs/saved_models/
