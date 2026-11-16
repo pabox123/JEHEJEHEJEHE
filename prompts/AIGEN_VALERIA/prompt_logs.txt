@@ -41,3 +41,48 @@ FINAL IMPLEMENTATION:
   create_balanced_binary_dataset, load_and_prepare_goemotions
 - Validated with test cases showing correct handling of mixed, ambiguous, and neutral
 ================================================================================
+
+================================================================================
+INTERACTION #2: Word Clouds and Top Frequent Words for Reddit Data
+Date: November 17, 2026
+Task: Generate word clouds and top frequent words analysis for sentiment classes
+================================================================================
+CONTEXT PROVIDED TO AI:
+- Dataset: GoEmotions (balanced 500/500 positive/negative Reddit comments)
+- Task: Create word clouds and top frequent words visualization
+- Challenge: Reddit data contains platform-specific noise and mask tokens
+- Requirement: Clear visual distinction between positive and negative classes
+PROMPT USED:
+"Generate code for WordCloud and top frequent words visualization for positive
+and negative sentiment classes. Use NLTK stopwords and make it visually clear."
+AI OUTPUT SUMMARY:
+- Generated basic WordCloud with NLTK stopwords
+- Used default colormap (no sentiment-specific colors)
+- Did not handle Reddit-specific noise ("u/", "reddit", "edit", "thanks")
+- Did not account for GoEmotions mask tokens ([NAME], [RELIGION])
+- No top words bar chart (only word clouds)
+MANUAL ADJUSTMENTS MADE:
+1. Custom stopword list: Created REDDIT_STOPWORDS set with platform-specific
+   terms ("u", "reddit", "edit", "thanks", "thank", "like", "just", "really")
+   and mask tokens ("name", "religion"). Combined with NLTK stopwords to create
+   a comprehensive filter.
+2. Visualization refinement: 
+   - Used 'Greens' colormap for positive comments
+   - Used 'Reds' colormap for negative comments
+   - Set max_words=100 and max_font_size=100 for better readability
+   - Added clear titles with sentiment labels
+3. Top words analysis: Added horizontal bar chart showing top 20 words per
+   class with frequency counts. This complements the word cloud by providing
+   exact frequency values and making it easier to compare across classes.
+4. Code organization: Split the logic into clear steps:
+   - Define custom stopwords
+   - Filter text
+   - Generate word cloud
+   - Calculate top words
+   - Visualize both
+FINAL IMPLEMENTATION:
+- File: notebooks/01_eda.ipynb (cells added at the end)
+- Visualizations: wordclouds.png and top_words.png in outputs/figures/
+- Key improvement: Word clouds now show sentiment-specific vocabulary without
+  noise from Reddit platform terms or GoEmotions mask tokens
+================================================================================
