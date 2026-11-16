@@ -1,0 +1,9 @@
+{
+  "train_size": 480,
+  "test_size": 120,
+  "test_size_ratio": 0.2,
+  "random_seed": 42,
+  "max_length": 64,
+  "batch_size": 16,
+  "model_name": "distilbert-base-uncased"
+}

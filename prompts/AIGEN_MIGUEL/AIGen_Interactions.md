@@ -1,0 +1,18 @@
+# AIGen Interactions Log - Team CyED3 (Miguel)
+
+**Project:** CED-III-IT2 - Sentiment Analysis on GoEmotions  
+**Student:** Miguel  
+**AIGen Tool Used:** Qwen  
+**Level of Use:** 3 - Collaboration with GenAI (critique, adjustment and refinement of outputs)
+
+---
+
+## Interaction Log
+
+| Date            | Prompt (Context + Request) | AI Output (Summary) | Adjustments and Refinements (My Conceptual Contribution) |
+|:----------------| :--- | :--- | :--- |
+| **11-Nov-2026** | **Context:** I have a balanced dataset of 500 positive and 500 negative Reddit comments (GoEmotions). <br>**Prompt:** "Write a PyTorch `Dataset` class and a tokenization loop for fine-tuning DistilBERT. Make sure it handles `input_ids`, `attention_mask` and `labels`." | The AI generated a generic Hugging Face `Dataset` class. It used dynamic tokenization without fixed padding and did not handle possible `NaN` values in the texts. | 1. **Bug fix:** I added an explicit `str(text)` in `__getitem__` to avoid errors from null values in the CSV.<br>2. **Technical adjustment:** I changed the padding to `'max_length'` with `truncation=True` so that all tensors in a batch have the same shape, which PyTorch DataLoaders require.<br>3. **Validation:** I manually checked that the tokenizer was `DistilBertTokenizerFast` and not the base BERT one, to meet the required extension. |
+| **11-Nov-2026** | **Context:** I need to connect RNN/LSTM and Transformer architectures with the concepts from Unit 3 (Turing Machines, OE3.4, OE3.6). <br>**Prompt:** "Explain the relationship between the memory of an LSTM, the attention of a Transformer and a Turing Machine for an academic report." | The AI gave a shallow analogy: "Both process information step by step, like a Turing tape." It was inaccurate, since Transformers do *not* process strictly step by step. | 1. **Major conceptual correction:** I rewrote the section to clarify that the LSTM's **hidden state** is the closest analog to the "tape and state" of a TM, because it compresses the history into a fixed-size vector.<br>2. **Added depth:** I noted that the Transformer's **self-attention** mechanism breaks the strict sequentiality of the classical TM by allowing "random" access to the whole sequence. This changes the *computational complexity* (from O(n) to O(n²) in attention), although the computability limit (Turing completeness) remains.<br>3. **Alignment:** I made sure the terms "computability" and "formal languages" were mentioned explicitly to meet OE3.6. |
+| **11-Nov-2026** | **Context:** I have the Spanish draft of the "Comparative Analysis" section with the F1-score and Cohen's Kappa results. <br>**Prompt:** "Translate and polish this text into technical academic English for a Machine Learning report. Keep a formal and objective tone." | The translation was grammatically correct, but it used AI clichés such as "delve into", "a testament to" and "navigating the landscape of NLP". It also overgeneralized the interpretation of Kappa. | 1. **Style cleanup:** I removed all the AI buzzwords and replaced them with direct technical language (e.g., "delve into" became "evaluate", and "testament to" became "indicates").<br>2. **Statistical precision:** The AI described a Kappa of 0.65 as "excellent". I corrected it to "substantial agreement" based on the Landis & Koch scale, the academic standard.<br>3. **Data verification:** I confirmed that the reported metrics (Accuracy, F1) matched the outputs saved in `outputs/metrics/` exactly, since the AI had rounded one decimal too many in its summary. |
+
+---
