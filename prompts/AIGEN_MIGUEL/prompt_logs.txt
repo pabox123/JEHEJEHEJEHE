@@ -2,180 +2,58 @@
 AIGen Usage Log - Team CyED3 (Miguel)
 Project: CED-III-IT2 - Sentiment Analysis on GoEmotions
 Student: Miguel
-AIGen Tool: Qwen
+AIGen Tool: Qwen (Qwen3.7, chat interface)
 Level of Use: 3 - Collaboration with AIGen
+Log version: 2 (audited and deduplicated on 17-Nov-2026)
 ================================================================================
 
 OVERVIEW
 --------
-This document logs all interactions with AI-generated tools during the development
-of the Integrative Task 2 for CED-III-IT2. The log includes prompts used, context
-provided, AI outputs received, and manual adjustments made to ensure conceptual
-mastery and alignment with project requirements.
+This document logs the interactions with AI-generation tools carried out by
+Miguel during the Integrative Task 2 of CED-III-IT2. Each entry records the
+context provided, the verbatim prompt, a summary of the output, the manual
+adjustments made, and the repository file where the refined result lives.
 
-All interactions demonstrate Level 3 usage: critical evaluation, adjustment, and
-refinement of AI-generated content.
-
-================================================================================
-INTERACTION #1: Transformer Dataset Implementation
-Date: November 11, 2026
-Task: Implement PyTorch Dataset class for DistilBERT fine-tuning
-================================================================================
-
-CONTEXT PROVIDED TO AI:
-- Dataset: GoEmotions (filtered to 500 positive + 500 negative comments)
-- Model: DistilBERT (distilbert-base-uncased)
-- Framework: PyTorch with Hugging Face Transformers
-- Requirements: Must handle input_ids, attention_mask, and labels
-- Constraint: Dataset must be compatible with PyTorch DataLoader for batching
-
-PROMPT USED:
-"Write a PyTorch Dataset class and tokenization loop for fine-tuning DistilBERT 
-on a binary sentiment classification task. The dataset contains Reddit comments 
-with labels 0 (negative) and 1 (positive). Ensure it handles input_ids, 
-attention_mask, and labels. The tokenization should use DistilBertTokenizerFast."
-
-AI OUTPUT SUMMARY:
-- Generated a generic Dataset class with basic tokenization
-- Used dynamic padding (no fixed max_length)
-- Did not explicitly handle potential NaN or null values in text data
-- Tokenizer was correct (DistilBertTokenizerFast)
-
-MANUAL ADJUSTMENTS MADE:
-1. Added explicit str(text) conversion in __getitem__ to prevent errors from 
-   null values in the CSV (common issue with Reddit data)
-2. Changed padding strategy from dynamic to 'max_length' with truncation=True 
-   to ensure all tensors in a batch have identical shapes (required for 
-   PyTorch DataLoader collation)
-3. Verified tokenizer was DistilBertTokenizerFast (not BERT base) to match 
-   project requirements
-4. Added sequence length analysis to determine optimal MAX_LENGTH=64 based on 
-   95th percentile of token counts
-
-FINAL IMPLEMENTATION:
-- File: notebooks/04_transformer_extension.ipynb (cells 6-8)
-- Class: GoEmotionsDataset with proper error handling and fixed-length padding
-- Validated with sample batches to ensure correct tensor shapes
+All interactions demonstrate Level 3 usage: critical evaluation, adjustment and
+refinement of AI-generated content. Claims that could not be verified against
+the repository were removed and the removal itself is logged below.
 
 ================================================================================
-INTERACTION #2: Turing Machine Connection (Theoretical Analysis)
-Date: November 12, 2026
-Task: Connect RNN/LSTM/Transformer architectures to Turing Machine concepts
+CORRECTIONS TO EARLIER LOG ENTRIES (17-Nov-2026)
 ================================================================================
 
-CONTEXT PROVIDED TO AI:
-- Course: Computación y Estructuras Discretas III (CED-III)
-- Learning Objectives: OE3.3 to OE3.6 (Turing Machines, computability, formal languages)
-- Task: Explain how neural network architectures relate to Turing Machine concepts
-- Key concepts to cover: memory, sequence processing, computability
-- Audience: Academic report for university-level computer science course
+C1. FABRICATED METRICS REMOVED
+    Earlier versions of this log referenced Cohen's Kappa = 0.65 and
+    F1 = 0.847 for the Dense, RNN and LSTM models. Those notebooks
+    (03_dense_rnn_lstm.ipynb) are still "To be implemented" placeholders and no
+    such metrics exist in outputs/metrics/. The only tracked metrics file is
+    transformer_metrics.json. All references to those numbers were deleted.
 
-PROMPT USED:
-"Explain the relationship between LSTM memory, Transformer attention mechanisms, 
-and Turing Machines for an academic report. Focus on how these architectures 
-process sequences and manage memory, and relate this to computability theory."
+C2. DUPLICATED BLOCKS MERGED
+    The previous file contained interactions #1-#3 twice, under two different
+    tool headers (Qwen and "Claude 3.5 Sonnet / Cursor IDE") and inconsistent
+    dates (11-Nov vs 12/13-Nov). The duplicated block was removed and a single
+    chronological log was kept, attributed to the tool actually used.
 
-AI OUTPUT SUMMARY:
-- Provided superficial analogy: "Both process information step-by-step like a 
-  Turing Machine tape"
-- Claimed Transformers process sequentially (incorrect)
-- Did not distinguish between different types of memory (hidden state vs. 
-  attention)
-- Lacked depth on computability and formal language theory
+C3. CITATION CORRECTED
+    The claim "Transformers can model context-free grammars more effectively
+    (Weiss et al., 2021)" was misattributed and overstated. Correct references:
+      - Yun, Bhojanapalli, Rawat, Reddi, Kumar (2020). "Are Transformers
+        universal approximators of sequence-to-sequence functions?" ICLR.
+      - Perez, Barcelo, Marinkovic (2021). "Attention is Turing Complete." JMLR.
+      - Hahn (2020). "Theoretical Limitations of Self-Attention in Neural
+        Sequence Models." TACL. Shows fixed-depth Transformers cannot model
+        PARITY or DYCK-2, i.e. they are not unrestricted Turing Machines.
+    The report now separates idealized Turing-completeness results from the
+    bounded behaviour of an actual implementation.
 
-MANUAL ADJUSTMENTS MADE:
-1. Corrected fundamental misconception: Transformers do NOT process sequentially.
-   Rewrote to clarify that self-attention allows "random access" to all positions
-   in the sequence simultaneously, unlike the sequential tape of a Turing Machine.
+C4. UNVERIFIED RUNTIME CLAIM REMOVED
+    The "45 min -> 8 min per epoch (~80% reduction)" figure was not measured
+    with a logged timer. The optimization is kept, but the numeric claim is
+    withheld until it is recorded in logs/experiment_notes.md.
 
-2. Refined the LSTM analogy: The hidden state (h_t) is the closest analog to the
-   Turing Machine's "tape + state" combination, as it compresses the entire 
-   history into a fixed-size vector. However, this creates a bottleneck (limited
-   memory capacity), which is a key limitation.
-
-3. Added computational complexity analysis:
-   - RNN/LSTM: O(n) sequential processing, limited by vanishing gradients
-   - Transformer: O(n²) attention computation, but parallelizable
-   - Both are Turing-complete in theory, but practical limitations differ
-
-4. Explicitly connected to OE3.6 (computability): Mentioned that while all three
-   architectures are theoretically capable of computing any Turing-computable 
-   function, the practical efficiency and learnability differ significantly.
-
-5. Added discussion of formal languages: RNNs can recognize regular languages,
-   while Transformers with self-attention can model context-free grammars more
-   effectively (citing theoretical work by Weiss et al., 2021).
-
-FINAL IMPLEMENTATION:
-- File: docs/report.pdf (Section 5: Comparative Analysis)
-- Length: ~1.5 pages of theoretical analysis
-- Key terms included: "hidden state", "tape", "computability", "formal languages",
-  "sequential vs. parallel processing"
-
-================================================================================
-INTERACTION #3: Academic Report Translation and Refinement
-Date: November 13, 2026
-Task: Translate and polish Comparative Analysis section to academic English
-================================================================================
-
-CONTEXT PROVIDED TO AI:
-- Source text: Draft in Spanish of the Comparative Analysis section
-- Target: Academic English for university-level ML report
-- Tone: Formal, objective, technical
-- Requirements: Must include metrics (Accuracy, Precision, Recall, F1, Cohen's Kappa)
-- Constraint: Avoid cliché AI phrases ("delve into", "testament to", etc.)
-
-PROMPT USED:
-"Translate and polish this text to technical academic English for a Machine 
-Learning report. Maintain a formal and objective tone. Avoid cliché phrases 
-commonly used by AI."
-
-AI OUTPUT SUMMARY:
-- Translation was grammatically correct
-- Used cliché phrases: "delve into", "a testament to", "navigating the landscape"
-- Described Cohen's Kappa of 0.65 as "excellent" (incorrect interpretation)
-- Rounded some metrics incorrectly (e.g., 0.847 → 0.85)
-
-MANUAL ADJUSTMENTS MADE:
-1. Removed all AI clichés and replaced with direct technical language:
-   - "delve into" → "evaluate"
-   - "testament to" → "indicates"
-   - "navigating the landscape of NLP" → "in sentiment analysis tasks"
-
-2. Corrected statistical interpretation:
-   - Kappa = 0.65 is "substantial agreement" (per Landis & Koch scale), 
-     not "excellent"
-   - Added reference to the standard interpretation scale in the report
-
-3. Verified all metrics against raw data in outputs/metrics/:
-   - AI had rounded 0.847 to 0.85, but I kept 0.847 for precision
-   - Cross-checked F1-scores for all models to ensure consistency
-
-4. Added explicit comparison table with all metrics (Accuracy, Precision, Recall,
-   F1, Kappa) for Dummy, Dense NN, RNN, LSTM, and Transformer models
-
-FINAL IMPLEMENTATION:
-- File: docs/report.pdf (Section 5: Comparative Analysis)
-- Language: Technical academic English, no AI clichés
-- Metrics: All values verified against experimental outputs
-- Interpretation: Statistically accurate (correct Kappa scale usage)
-================================================================================
-AIGen Usage Log - Team CyED3 (Miguel)
-Project: CED-III-IT2 - Sentiment Analysis on GoEmotions
-Student: Miguel
-AIGen Tool: Claude 3.5 Sonnet / Cursor IDE
-Level of Use: 3 - Collaboration with AIGen
-================================================================================
-
-OVERVIEW
---------
-This document logs all interactions with AI-generated tools during the development
-of the Integrative Task 2 for CED-III-IT2. The log includes prompts used, context
-provided, AI outputs received, and manual adjustments made to ensure conceptual
-mastery and alignment with project requirements.
-
-All interactions demonstrate Level 3 usage: critical evaluation, adjustment, and
-refinement of AI-generated content.
+C5. MALFORMED FOOTER FIXED
+    The previous file ended with a corrupted terminator ("X===..."). Removed.
 
 ================================================================================
 INTERACTION #1: Transformer Dataset Implementation
@@ -200,36 +78,38 @@ AI OUTPUT SUMMARY:
 - Generated a generic Dataset class with basic tokenization
 - Used dynamic padding (no fixed max_length)
 - Did not explicitly handle potential NaN or null values in text data
-- Tokenizer was correct (DistilBertTokenizerFast)
+- Tokenizer choice was correct (DistilBertTokenizerFast)
 
 MANUAL ADJUSTMENTS MADE:
 1. Added explicit str(text) conversion in __getitem__ to prevent errors from
-   null values in the CSV (common issue with Reddit data)
-2. Changed padding strategy from dynamic to 'max_length' with truncation=True
-   to ensure all tensors in a batch have identical shapes (required for
-   PyTorch DataLoader collation)
-3. Verified tokenizer was DistilBertTokenizerFast (not BERT base) to match
-   project requirements
-4. Added sequence length analysis to determine optimal MAX_LENGTH=64 based on
-   95th percentile of token counts
+   null values in the CSV (common issue with Reddit data).
+2. Changed padding from dynamic to 'max_length' with truncation=True so all
+   tensors in a batch have identical shapes (required by the default DataLoader
+   collate function).
+3. Verified the tokenizer is DistilBertTokenizerFast and not the BERT one, to
+   match the required extension.
+4. Added a sequence-length analysis (histogram + cumulative distribution) to
+   justify MAX_LENGTH=64 instead of accepting a default value.
 
 FINAL IMPLEMENTATION:
 - File: notebooks/04_transformer_extension.ipynb (cells 6-8)
-- Class: GoEmotionsDataset with proper error handling and fixed-length padding
-- Validated with sample batches to ensure correct tensor shapes
+- Class: GoEmotionsDataset
+- Figure: outputs/figures/04_sequence_length_distribution.png
+- Config: outputs/processed/04_tokenization_config.json
+- Validated with a sample batch: input_ids and attention_mask of shape (16, 64)
 
 ================================================================================
 INTERACTION #2: Turing Machine Connection (Theoretical Analysis)
-Date: November 11, 2026
+Date: November 12, 2026
 Task: Connect RNN/LSTM/Transformer architectures to Turing Machine concepts
 ================================================================================
 
 CONTEXT PROVIDED TO AI:
-- Course: Computación y Estructuras Discretas III (CED-III)
-- Learning Objectives: OE3.3 to OE3.6 (Turing Machines, computability, formal languages)
-- Task: Explain how neural network architectures relate to Turing Machine concepts
+- Course: Computacion y Estructuras Discretas III (CED-III)
+- Learning Objectives: OE3.3 to OE3.6 (Turing Machines, computability, formal
+  languages)
 - Key concepts to cover: memory, sequence processing, computability
-- Audience: Academic report for university-level computer science course
+- Audience: academic report for a university-level computer science course
 
 PROMPT USED:
 "Explain the relationship between LSTM memory, Transformer attention mechanisms,
@@ -237,160 +117,421 @@ and Turing Machines for an academic report. Focus on how these architectures
 process sequences and manage memory, and relate this to computability theory."
 
 AI OUTPUT SUMMARY:
-- Provided superficial analogy: "Both process information step-by-step like a
-  Turing Machine tape"
-- Claimed Transformers process sequentially (incorrect)
-- Did not distinguish between different types of memory (hidden state vs.
-  attention)
-- Lacked depth on computability and formal language theory
+- Superficial analogy: "Both process information step-by-step like a Turing
+  Machine tape"
+- Implied that Transformers process sequentially (incorrect)
+- Did not distinguish hidden-state memory from attention-based access
+- No discussion of computability limits or formal language classes
 
 MANUAL ADJUSTMENTS MADE:
-1. Corrected fundamental misconception: Transformers do NOT process sequentially.
-   Rewrote to clarify that self-attention allows "random access" to all positions
-   in the sequence simultaneously, unlike the sequential tape of a Turing Machine.
-
-2. Refined the LSTM analogy: The hidden state (h_t) is the closest analog to the
-   Turing Machine's "tape + state" combination, as it compresses the entire
-   history into a fixed-size vector. However, this creates a bottleneck (limited
-   memory capacity), which is a key limitation.
-
-3. Added computational complexity analysis:
-   - RNN/LSTM: O(n) sequential processing, limited by vanishing gradients
-   - Transformer: O(n²) attention computation, but parallelizable
-   - Both are Turing-complete in theory, but practical limitations differ
-
-4. Explicitly connected to OE3.6 (computability): Mentioned that while all three
-   architectures are theoretically capable of computing any Turing-computable
-   function, the practical efficiency and learnability differ significantly.
-
-5. Added discussion of formal languages: RNNs can recognize regular languages,
-   while Transformers with self-attention can model context-free grammars more
-   effectively (citing theoretical work by Weiss et al., 2021).
+1. Corrected the central misconception: a Transformer does not carry a single
+   recurrent hidden state across positions. Self-attention gives every position
+   direct access to the whole context window in parallel during training.
+2. Refined the recurrent analogy: h_t is the closest analog to the TM
+   "state + working memory", because it compresses the processed prefix into a
+   fixed-size vector; the recurrent update plays the role of a transition rule.
+   The LSTM cell state adds explicit write/erase/expose operations via gates.
+3. Separated complexity from computability:
+   - RNN/LSTM: O(n) sequential steps; gradients vanish over long spans.
+   - Self-attention: O(n^2) pairwise operations, but O(1) sequential depth.
+   These are complexity statements, not computability statements.
+4. Bounded the computability claim (OE3.6): with finite precision, a fixed
+   hidden dimension and a 64-token window, the deployed models are bounded
+   devices, not unrestricted Turing Machines. Turing-completeness results for
+   Transformers hold only under idealized assumptions (unbounded precision,
+   unbounded context).
+5. Replaced the incorrect citation (see correction C3 above) with Yun et al.
+   (2020), Perez et al. (2021) and Hahn (2020).
 
 FINAL IMPLEMENTATION:
-- File: docs/report.pdf (Section 5: Comparative Analysis)
-- Length: ~1.5 pages of theoretical analysis
-- Key terms included: "hidden state", "tape", "computability", "formal languages",
-  "sequential vs. parallel processing"
+- File: docs/report.md (Section 5: Relation to Turing Machine Concepts)
+- Explicitly framed as an architectural interpretation, not an experimental
+  result obtained from this repository.
 
 ================================================================================
 INTERACTION #3: Academic Report Translation and Refinement
-Date: November 11, 2026
-Task: Translate and polish Comparative Analysis section to academic English
+Date: November 13, 2026
+Task: Translate and polish the Comparative Analysis section into academic English
 ================================================================================
 
 CONTEXT PROVIDED TO AI:
-- Source text: Draft in Spanish of the Comparative Analysis section
-- Target: Academic English for university-level ML report
-- Tone: Formal, objective, technical
-- Requirements: Must include metrics (Accuracy, Precision, Recall, F1, Cohen's Kappa)
-- Constraint: Avoid cliché AI phrases ("delve into", "testament to", etc.)
+- Source text: Spanish draft of the Comparative Analysis section
+- Target: academic English for a university-level ML report
+- Tone: formal, objective, technical
+- Constraint: avoid stock AI phrasing ("delve into", "testament to", etc.)
 
 PROMPT USED:
 "Translate and polish this text to technical academic English for a Machine
-Learning report. Maintain a formal and objective tone. Avoid cliché phrases
+Learning report. Maintain a formal and objective tone. Avoid cliche phrases
 commonly used by AI."
 
 AI OUTPUT SUMMARY:
-- Translation was grammatically correct
-- Used cliché phrases: "delve into", "a testament to", "navigating the landscape"
-- Described Cohen's Kappa of 0.65 as "excellent" (incorrect interpretation)
-- Rounded some metrics incorrectly (e.g., 0.847 → 0.85)
+- Grammatically correct translation
+- Stock phrasing: "delve into", "a testament to", "navigating the landscape"
+- Labelled a mid-range Cohen's Kappa as "excellent"
+- Inserted metric values for models that had not been trained
 
 MANUAL ADJUSTMENTS MADE:
-1. Removed all AI clichés and replaced with direct technical language:
-   - "delve into" → "evaluate"
-   - "testament to" → "indicates"
-   - "navigating the landscape of NLP" → "in sentiment analysis tasks"
-
-2. Corrected statistical interpretation:
-   - Kappa = 0.65 is "substantial agreement" (per Landis & Koch scale),
-     not "excellent"
-   - Added reference to the standard interpretation scale in the report
-
-3. Verified all metrics against raw data in outputs/metrics/:
-   - AI had rounded 0.847 to 0.85, but I kept 0.847 for precision
-   - Cross-checked F1-scores for all models to ensure consistency
-
-4. Added explicit comparison table with all metrics (Accuracy, Precision, Recall,
-   F1, Kappa) for Dummy, Dense NN, RNN, LSTM, and Transformer models
+1. Removed stock phrasing and substituted direct technical verbs:
+   "delve into" -> "evaluate"; "testament to" -> "indicates";
+   "navigating the landscape of NLP" -> "in sentiment analysis tasks".
+2. Corrected the statistical wording using the Landis & Koch scale
+   (0.61-0.80 = substantial agreement), instead of "excellent".
+3. Deleted every invented metric for Dense/RNN/LSTM (see correction C1) and
+   restricted the results table to the tracked Transformer artifact.
+4. Standardized metric names and decimal formatting to three places, matching
+   outputs/metrics/transformer_metrics.json.
 
 FINAL IMPLEMENTATION:
-- File: docs/report.pdf (Section 5: Comparative Analysis)
-- Language: Technical academic English, no AI clichés
-- Metrics: All values verified against experimental outputs
-- Interpretation: Statistically accurate (correct Kappa scale usage)
+- File: docs/report.md (Sections 4 and 5)
+- Language: technical academic English
 
 ================================================================================
-INTERACTION #4: Code Optimization for Training Loop
-Date: November 9, 2026
-Task: Optimize training loop for Transformer fine-tuning
+INTERACTION #4: Training Loop Optimization on CPU
+Date: November 14, 2026
+Task: Reduce fine-tuning time in a CPU-only environment
 ================================================================================
 
 CONTEXT PROVIDED TO AI:
-- Model: DistilBERT fine-tuning on 1000 samples (500 pos + 500 neg)
-- Framework: PyTorch with Hugging Face
-- Issue: Training was slow, taking ~45 minutes per epoch on CPU
-- Goal: Reduce training time while maintaining accuracy
+- Hardware: Asus laptop, Windows, CPU only (no CUDA device)
+- Model: DistilBERT fine-tuning on ~1,000 samples
+- Symptom: epochs far slower than expected for a dataset of this size
 
 PROMPT USED:
-"My Transformer training loop is taking 45 minutes per epoch on CPU for a
-dataset of 1000 samples. How can I optimize it without losing accuracy?"
+"My Transformer training loop is slow on CPU for a dataset of 1,000 samples.
+How can I optimize it without losing accuracy?"
 
 AI OUTPUT SUMMARY:
-- Suggested using GPU (not applicable, I only have CPU)
-- Recommended reducing batch size (would increase training time)
-- Suggested gradient accumulation (good idea, but not the bottleneck)
-- Did not identify the actual issue: redundant tokenization in each epoch
+- Recommended using a GPU (not available on this machine)
+- Recommended reducing the batch size (increases the number of optimizer steps)
+- Recommended gradient accumulation (addresses memory, not throughput)
+- Did not identify repeated tokenization as the bottleneck
 
 MANUAL ADJUSTMENTS MADE:
-1. Identified root cause: The Dataset class was re-tokenizing texts in every
-   __getitem__ call, causing massive overhead.
-
-2. Implemented pre-tokenization: Tokenize the entire dataset once before
-   creating the Dataset, then store input_ids and attention_mask as tensors.
-   This reduced epoch time from 45 min to ~8 min.
-
-3. Added caching mechanism: Save pre-tokenized data to disk
-   (outputs/processed/tokenized_data.pt) to avoid re-tokenization across runs.
-
-4. Optimized DataLoader: Set num_workers=0 (since data is small and
-   pre-tokenized) to avoid multiprocessing overhead.
+1. Diagnosed the hot path: tokenization was executed inside __getitem__, i.e.
+   once per sample per epoch, instead of once per dataset.
+2. Rejected the GPU suggestion (no CUDA device) and the smaller-batch suggestion
+   (it worsens throughput when the loop is CPU-bound).
+3. Moved tokenization out of the per-item path and kept num_workers=0, since
+   worker startup costs exceed the benefit for a small in-memory dataset.
+4. Withheld the numeric speedup claim until timed runs are written to
+   logs/experiment_notes.md (see correction C4).
 
 FINAL IMPLEMENTATION:
 - File: notebooks/04_transformer_extension.ipynb (cells 7-8)
-- Optimization: Pre-tokenization + disk caching
-- Result: Training time reduced by ~80% (45 min → 8 min per epoch)
+- Status: optimization applied; timing measurement pending
+
+================================================================================
+INTERACTION #5: Repository Scaffold Generation
+Date: November 14, 2026
+Task: Generate the folder structure mandated by the assignment
+================================================================================
+
+CONTEXT PROVIDED TO AI:
+- Required layout: data/, notebooks/, src/, outputs/, docs/, prompts/, logs/
+- Constraint: no git init, no commits, no pushes
+- Placeholder content only
+
+PROMPT USED:
+"Generate the full repository structure for CED-III-IT2 with placeholder files.
+Do not run git init and do not create any commit. Create .gitkeep files in
+directories that would otherwise be empty."
+
+AI OUTPUT SUMMARY:
+- Produced the directory tree
+- Created zero-byte report.pdf and presentation.pdf placeholders
+- Omitted .gitkeep in several empty directories
+
+MANUAL ADJUSTMENTS MADE:
+1. Verified with git log that no commit had been created, as instructed.
+2. Deleted the zero-byte PDFs: an unreadable PDF in docs/ is worse than an
+   absent one, since the rubric expects a readable deliverable.
+3. Added .gitkeep to data/raw, data/processed and the outputs subdirectories,
+   because Git does not track empty directories.
+4. Added a docstring to each src/ module describing its responsibility, to
+   support the modular-code expectation in the assignment.
+
+FINAL IMPLEMENTATION:
+- Repository root structure
+- Commit: "chore: initialize repository structure and base README"
+
+================================================================================
+INTERACTION #6: Dependency Specification
+Date: November 14, 2026
+Task: Produce requirements.txt and environment.yml
+================================================================================
+
+CONTEXT PROVIDED TO AI:
+- Mixed team: some members use pip, others conda
+- CPU-only target machine
+- Libraries actually imported by the notebooks
+
+PROMPT USED:
+"Create requirements.txt and environment.yml with torch, transformers,
+scikit-learn, pandas, matplotlib and the NLP utilities used in the project."
+
+AI OUTPUT SUMMARY:
+- Placed every package under conda dependencies, including transformers
+- Left the Python version unpinned
+- Included packages not imported anywhere in the project
+
+MANUAL ADJUSTMENTS MADE:
+1. Moved transformers, tokenizers, wordcloud and nltk into the pip: subsection
+   of environment.yml, since the required versions are not reliably published
+   on the default conda channels.
+2. Named the environment ced3-it2 and added ipykernel so the notebooks can
+   register it as a Jupyter kernel.
+3. Removed unused dependencies to keep installation feasible on a CPU-only
+   machine.
+
+FINAL IMPLEMENTATION:
+- Files: requirements.txt, environment.yml
+- Commit: "build: add requirements.txt with project dependencies"
+
+================================================================================
+INTERACTION #7: Transformer Model Architecture
+Date: November 15, 2026
+Task: Implement TransformerSentiment in src/models.py
+================================================================================
+
+CONTEXT PROVIDED TO AI:
+- Binary classification, labels 0/1
+- Backbone: distilbert-base-uncased
+- Requirement: the pooling strategy must be explicit and defensible in the report
+
+PROMPT USED:
+"Implement a DistilBERT-based binary classifier in PyTorch with a classification
+head and dropout."
+
+AI OUTPUT SUMMARY:
+- Used DistilBertForSequenceClassification, hiding the head inside the library
+- Applied mean pooling over all positions, including padding tokens
+- Hard-coded the hidden size as 768
+
+MANUAL ADJUSTMENTS MADE:
+1. Switched to DistilBertModel plus an explicit nn.Sequential head, so the
+   architecture can be described precisely in Section 3 of the report.
+2. Replaced unmasked mean pooling with the first hidden state ([:, 0, :]),
+   the [CLS] position, to avoid averaging padding vectors into the sentence
+   representation.
+3. Read hidden_size from self.distilbert.config instead of hard-coding it, so
+   the module remains valid if the backbone changes.
+
+FINAL IMPLEMENTATION:
+- File: src/models.py (class TransformerSentiment)
+- Head: Dropout -> Linear(768, 384) -> ReLU -> Dropout -> Linear(384, 2)
+
+================================================================================
+INTERACTION #8: Training and Evaluation Routines
+Date: November 15, 2026
+Task: Implement train_transformer and evaluate_transformer
+================================================================================
+
+CONTEXT PROVIDED TO AI:
+- Required metrics: accuracy, precision, recall, F1-score, Cohen's kappa
+- Must return a confusion matrix and a classification report
+- Must persist metrics to outputs/metrics/
+
+PROMPT USED:
+"Write a training loop with validation and an evaluation function that returns
+all classification metrics for the Transformer."
+
+AI OUTPUT SUMMARY:
+- Plain Adam, no decoupled weight decay
+- No gradient clipping
+- Returned last-epoch weights rather than the best validation checkpoint
+- Left the averaging scheme for precision/recall/F1 implicit
+
+MANUAL ADJUSTMENTS MADE:
+1. Used AdamW, which decouples weight decay from the adaptive update and is the
+   standard optimizer for fine-tuning BERT-family models.
+2. Added clip_grad_norm_(max_norm=1.0) to avoid loss spikes.
+3. Tracked best_val_acc, stored best_model_state and restored it before
+   evaluation, so reported metrics correspond to the selected checkpoint.
+4. Made averaging explicit (average='binary') and added cohen_kappa_score,
+   which the assignment requires for the neural-model comparison.
+5. Serialized results to outputs/metrics/transformer_metrics.json and saved the
+   confusion matrix figure.
+
+FINAL IMPLEMENTATION:
+- Files: src/train.py, src/evaluate.py
+- Outputs: outputs/metrics/transformer_metrics.json,
+  outputs/figures/04_transformer_confusion_matrix.png,
+  outputs/figures/04_transformer_training_curves.png
+
+================================================================================
+INTERACTION #9: Git Large-File Rejection
+Date: November 16, 2026
+Task: Push a branch rejected by GitHub because of a 254 MB model file
+================================================================================
+
+CONTEXT PROVIDED TO AI:
+- Error: GH001 Large files detected, pre-receive hook declined
+- File: outputs/saved_models/transformer_model.pt (254.32 MB)
+- GitHub limit: 100 MB per file
+
+PROMPT USED:
+"GitHub rejects my push because a .pt file is 254 MB. How do I fix it?"
+
+AI OUTPUT SUMMARY:
+- Suggested git rm --cached plus .gitignore in a new commit
+- Did not explain that the blob remains reachable from earlier commits
+- Did not mention that GitHub validates every object in the pushed refs
+
+MANUAL ADJUSTMENTS MADE:
+1. Diagnosed why the suggested fix failed: ignoring a path in HEAD does not
+   remove the object from history, so the push kept being rejected.
+2. Rebuilt the branch from a clean base and staged only source files, figures
+   and JSON metrics, so no oversized blob was reachable from the pushed refs.
+3. Aligned the decision with the assignment, which allows saved_models/ only
+   "if small enough". At 254 MB the weights are excluded and can be regenerated
+   by re-running notebook 04; this is documented in README.md.
+4. Resolved a subsequent git stash pop conflict on the notebook with
+   git checkout --ours, then verified the file contents before committing.
+5. Added "*.pt" and "outputs/saved_models/" to .gitignore to prevent recurrence.
+
+FINAL IMPLEMENTATION:
+- File: .gitignore
+- Commit: "feat: add training loop and metrics extraction for Transformer"
+
+================================================================================
+INTERACTION #10: Report Draft and Unsupported Claims
+Date: November 16, 2026
+Task: Draft the comparative analysis section of the report
+================================================================================
+
+CONTEXT PROVIDED TO AI:
+- Report must be in English, 2-4 pages including figures and references
+- Repository state: only the Transformer notebook is implemented
+
+PROMPT USED:
+"Write the comparative analysis and the Turing Machine connection section for
+the report."
+
+AI OUTPUT SUMMARY:
+- Asserted the ranking DistilBERT > LSTM > RNN > Dense > Dummy as a measured
+  result
+- Filled a comparison table with invented metric values
+- Presented theoretical interpretation as experimental evidence
+
+MANUAL ADJUSTMENTS MADE:
+1. Removed the ranking and every fabricated value. Section 3.1 of the report now
+   states that 01_eda.ipynb, 02_baseline_model.ipynb and 03_dense_rnn_lstm.ipynb
+   are placeholders with no verified implementation.
+2. Separated measurement (Section 4) from architectural interpretation
+   (Section 5), so theory is never presented as an experimental finding.
+3. Kept the document inside the 2-4 page limit.
+
+FINAL IMPLEMENTATION:
+- File: docs/report.md
+- Commit: "docs: assemble final complete report with all sections"
+
+================================================================================
+INTERACTION #11: Interpretation of the Perfect Transformer Score
+Date: November 17, 2026
+Task: Interpret Accuracy = Precision = Recall = F1 = Kappa = 1.000
+================================================================================
+
+CONTEXT PROVIDED TO AI:
+- transformer_metrics.json reports 1.000 on every metric
+- Recorded split: 480 train / 120 test
+- data/ is not versioned
+
+PROMPT USED:
+"My DistilBERT model got a perfect score on the test set. Explain why this proves
+the Transformer is better than the recurrent models."
+
+AI OUTPUT SUMMARY:
+- Accepted the premise without questioning it
+- Produced a paragraph claiming state-of-the-art performance and superior
+  generalization to Reddit text
+
+MANUAL ADJUSTMENTS MADE:
+1. Rejected the leading premise. A perfect score on a small test set is a
+   warning sign, not evidence of superiority.
+2. Traced the likely cause: notebook 04 falls back to a synthetic dataset built
+   from six repeated templates when data/processed/balanced_dataset.csv is
+   missing. Such data is trivially separable and would produce exactly this
+   result.
+3. Noted a provenance gap: data/ is excluded from version control, so the
+   repository cannot prove which CSV produced the tracked metrics. The recorded
+   split (480/120) is also smaller than the intended 800/200 from 1,000 samples.
+4. Rewrote Section 4 to state that the result must not be generalized to
+   GoEmotions without re-running with the intended data and documenting its
+   provenance.
+5. Clarified that Kappa = 1.0 means complete agreement on that specific balanced
+   run and is not an estimate of performance on unseen comments.
+
+FINAL IMPLEMENTATION:
+- File: docs/report.md (Sections 2 and 4)
+
+================================================================================
+INTERACTION #12: Technical Presentation Design
+Date: November 17, 2026
+Task: Design the 10-minute technical slide deck
+================================================================================
+
+CONTEXT PROVIDED TO AI:
+- 10 minutes, in English
+- Must be technical, explicitly NOT a product or showcase presentation
+- Rubric weights: Mastery of Content 40%, Conclusions 20%, Defence 30%
+
+PROMPT USED:
+"Design the slide deck for the oral defense: problem, methodology, results,
+Turing connection, conclusions."
+
+AI OUTPUT SUMMARY:
+- Pitch-style deck with an "our solution" slide and a benefits list
+- A confident "state-of-the-art results" bullet
+- Order did not match the written report
+
+MANUAL ADJUSTMENTS MADE:
+1. Removed the product framing and reordered the deck to mirror the report
+   (introduction, methodology, results, conclusions), as the rubric requires.
+2. Allocated two slides to the Turing Machine connection, since Mastery of
+   Content carries 40% of the presentation grade.
+3. Added an explicit caveat to the results slide about the synthetic fallback
+   and the models still pending implementation.
+4. Rehearsed to a 10-minute budget and moved the bibliography to a backup slide.
+
+FINAL IMPLEMENTATION:
+- Files: docs/presentation.md, docs/presentation.pdf
+- Commit: "docs: design technical presentation slides (10 min)"
 
 ================================================================================
 SUMMARY OF AIGen USAGE
 ================================================================================
 
-Total Interactions Logged: 4
-Level of Use: 3 (Collaboration with critical evaluation and refinement)
+Total interactions logged: 12
+Level of use: 3 (collaboration with critical evaluation and refinement)
 
-Key Contributions of Original Authorship:
-1. Identified and corrected fundamental misconceptions in AI outputs (e.g.,
-   Transformer sequential processing)
-2. Provided domain-specific context (Turing Machine theory, statistical
-   interpretation scales) that AI lacked
-3. Optimized code based on practical constraints (CPU-only environment)
-4. Verified all metrics and interpretations against experimental data
+Contributions of original authorship:
+1. Corrected the claim that Transformers process sequences step by step, and
+   separated complexity statements from computability statements.
+2. Replaced a misattributed citation with the correct formal-language results
+   (Yun et al. 2020; Perez et al. 2021; Hahn 2020).
+3. Rejected an unsupported empirical ranking and removed fabricated metrics
+   from both the report and this log.
+4. Diagnosed the per-epoch re-tokenization bottleneck and the Git
+   blob-in-history problem independently of the tool's suggestions.
+5. Identified the synthetic-data fallback as the most plausible explanation for
+   the perfect Transformer score, and restricted the report's claims
+   accordingly.
+6. Made explicit architectural decisions (CLS pooling, AdamW, gradient
+   clipping, best-checkpoint selection) that the generated code omitted.
 
-AI Contributions:
-1. Accelerated initial code scaffolding (Dataset class, training loop structure)
-2. Provided baseline translations and drafts for refinement
-3. Suggested optimization strategies (some applicable, some not)
+AI contributions:
+1. Initial scaffolding for the Dataset class, the model module and the training
+   loop.
+2. First drafts of the report and slide structure, subsequently rewritten.
+3. Optimization suggestions, some applicable and some rejected.
 
 Conclusion:
-AIGen tools were used as accelerators for boilerplate code and initial drafts,
-but all outputs were critically evaluated, adjusted, and refined to ensure
-technical accuracy, alignment with project requirements, and demonstration of
-conceptual mastery.
+GenAI was used to accelerate boilerplate and first drafts. Every output was
+checked against the repository and against the theory covered in Unit 3.
+Where the generated content was wrong, unverifiable or overstated, it was
+corrected or removed, and the correction was recorded in this log.
 
 ================================================================================
-END OF LOG
-================================================================================
-X================================================================================
 END OF LOG
 ================================================================================
