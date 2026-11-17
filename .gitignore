@@ -12,6 +12,11 @@
 .idea
 .idea/
 
+# GoEmotions Raw Data
+data/raw/*.tsv
+data/raw/*.csv
+data/raw/*.zip
+
 # Python
 __pycache__/
 *.py[cod]
@@ -42,3 +47,16 @@ outputs/saved_models/
 *.pt
 outputs/saved_models/
 
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# OS
+.DS_Store
+Thumbs.db
