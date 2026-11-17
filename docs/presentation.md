@@ -27,14 +27,15 @@ Universidad Icesi | November 2026
 ## Dataset: GoEmotions
 
 **Source**: GoEmotions dataset (Demszky et al., ACL 2020)
-- 58,009 Reddit comments with 27 fine-grained emotion labels
+- Official GoEmotions Reddit-comment dataset with 27 fine-grained emotion labels plus neutral
 - Official mapping to 3 sentiment groups: positive, negative, ambiguous
 
-**Our Subset**:
-- Filtered to positive and negative only
-- Balanced: 500 positive + 500 negative comments
+**Filtered and Balanced Subset**:
+- Filtering produced 29,991 consistent positive or negative comments
+- Source distribution: 9,214 negative and 20,777 positive
+- Balanced subset: 500 positive and 500 negative comments
+- Total balanced subset: 1,000 comments
 - Random seed = 42 for reproducibility
-- Average comment length: ~13 words
 
 **Example comments**:
 - Positive: *"A beautiful poem for a beautiful thing. Happy cake day btw!"*
@@ -50,7 +51,7 @@ Universidad Icesi | November 2026
 4. **Tokenization**:
    - Neural models: Word-level tokenization with embeddings
    - Transformer: `DistilBertTokenizerFast` (WordPiece)
-5. **Padding/Truncation**: Fixed max length (64 tokens for neural, 128 for Transformer)
+5. **Padding/Truncation**: Fixed maximum length of 64 tokens for the Transformer
 
 ---
 
@@ -90,19 +91,19 @@ Universidad Icesi | November 2026
 
 ## Results: Transformer Performance
 
-**Test Set Metrics** (120 samples):
+**Test Set Metrics** (200 samples):
 
 | Metric | Score |
 | :--- | :---: |
-| Accuracy | 1.000 |
-| Precision | 1.000 |
-| Recall | 1.000 |
-| F1-Score | 1.000 |
-| Cohen's Kappa | 1.000 |
+| Accuracy | 0.775 |
+| Precision | 0.762 |
+| Recall | 0.800 |
+| F1-Score | 0.780 |
+| Cohen's Kappa | 0.550 |
 
-**Important Note**: Perfect score may reflect synthetic development dataset. Full evaluation pending with complete GoEmotions subset.
+**Confusion Matrix**: `[[75, 25], [20, 80]]`
 
-**Confusion Matrix**: Perfect classification on test set (no false positives or false negatives)
+**Interpretation**: The model correctly classified 155 of 200 test comments and misclassified 45. This result describes the balanced 1,000-comment subset; it is not an evaluation of the complete GoEmotions dataset.
 
 ---
 

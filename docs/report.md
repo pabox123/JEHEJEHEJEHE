@@ -8,9 +8,9 @@ The repository currently contains a data-preparation plan and a working DistilBE
 
 ## 2. Dataset and Experimental Configuration
 
-The intended dataset is GoEmotions, which contains Reddit comments annotated with fine-grained emotions. The project plan reduces the task to two classes: positive and negative sentiment. The intended balanced subset contains 500 positive and 500 negative examples, using seed 42.
+The dataset is GoEmotions, containing Reddit comments annotated with fine-grained emotions. The implemented filtering step retains comments consistently associated with the positive or negative emotion groups and excludes ambiguous, neutral, and mixed comments.
 
-Raw and processed datasets are excluded from version control. Consequently, the repository does not independently verify the final contents of the CSV used in a particular notebook execution. The Transformer notebook includes a development fallback that creates a synthetic 1,000-example dataset when `data/processed/balanced_dataset.csv` is unavailable. This distinction is important when interpreting the saved metrics.
+Loading the three official TSV files produced 29,991 filtered comments: 9,214 negative and 20,777 positive. The balancing step randomly selected 500 comments from each class using seed 42, producing a 1,000-comment dataset saved as `data/processed/balanced_dataset.csv`. Raw TSV files and processed CSV files are excluded from version control.
 
 The Transformer notebook uses the following configuration:
 
@@ -20,8 +20,8 @@ The Transformer notebook uses the following configuration:
 | Tokenizer | `DistilBertTokenizerFast` |
 | Random seed | 42 |
 | Train/test split | 80/20, stratified |
-| Recorded training size | 480 |
-| Recorded test size | 120 |
+| Training size | 800 |
+| Test size | 200 |
 | Maximum sequence length | 64 tokens |
 | Batch size | 16 |
 | Epochs | 5 |
@@ -60,15 +60,13 @@ The implemented extension fine-tunes `distilbert-base-uncased` for binary classi
 
 ## 4. Available Transformer Result
 
-The tracked file `outputs/metrics/transformer_metrics.json` reports the following result:
+The tracked file `outputs/metrics/transformer_metrics.json` reports the following result on the 200-comment test split:
 
 | Model | Accuracy | Precision | Recall | F1-Score | Cohen's Kappa |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| DistilBERT | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 |
+| DistilBERT | 0.775 | 0.762 | 0.800 | 0.780 | 0.550 |
 
-The same artifact records five epochs, a learning rate of 2e-5, batch size 16, and maximum sequence length 64. These values are the only saved model metrics currently available in the repository. Because the dataset used for the run is not versioned and the notebook has a synthetic fallback, the perfect score should not be generalized to the full GoEmotions dataset without rerunning the experiment with the intended data and documenting its provenance.
-
-Cohen's kappa is computed in `src/evaluate.py` with `cohen_kappa_score`. On a balanced test set, a value of 1.0 means complete agreement between predictions and labels for that evaluation run. It does not by itself establish that the model will achieve the same performance on new Reddit comments.
+The confusion matrix is `[[75, 25], [20, 80]]`: 155 test comments were classified correctly and 45 were misclassified. Cohen's kappa is 0.550, indicating moderate agreement beyond chance for this test split. The result describes the balanced 1,000-comment subset and should not be generalized to the complete GoEmotions dataset.
 
 ## 5. Relation to Turing Machine Concepts
 

@@ -12,4 +12,6 @@ Academic machine learning project for sentiment analysis using a balanced subset
 
 ## Status: In Progress
 
-The project structure is prepared. Experiments, training, evaluation, and documentation will be completed during the project.
+The GoEmotions preprocessing pipeline and the DistilBERT implementation are complete. The filtered dataset contains 29,991 consistent positive or negative comments: 9,214 negative and 20,777 positive. From that dataset, 500 comments were sampled from each class using random seed 42, producing a 1,000-comment balanced dataset.
+
+The DistilBERT run is recorded with accuracy 0.775, precision 0.762, recall 0.800, F1 0.780, and Cohen's kappa 0.550. The dummy, dense, RNN, and LSTM experiments remain pending.

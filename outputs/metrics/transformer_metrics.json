@@ -1,12 +1,18 @@
 {
-  "model": "DistilBERT",
-  "accuracy": 1.0,
-  "precision": 1.0,
-  "recall": 1.0,
-  "f1": 1.0,
-  "kappa": 1.0,
-  "epochs": 5,
-  "learning_rate": 2e-05,
-  "batch_size": 16,
-  "max_length": 64
+  "accuracy": 0.775,
+  "precision": 0.7619047619047619,
+  "recall": 0.8,
+  "f1": 0.7804878048780488,
+  "kappa": 0.55,
+  "confusion_matrix": [
+    [
+      75,
+      25
+    ],
+    [
+      20,
+      80
+    ]
+  ],
+  "classification_report": "              precision    recall  f1-score   support\n\n    negative       0.79      0.75      0.77       100\n    positive       0.76      0.80      0.78       100\n\n    accuracy                           0.78       200\n   macro avg       0.78      0.78      0.77       200\nweighted avg       0.78      0.78      0.77       200\n"
 }

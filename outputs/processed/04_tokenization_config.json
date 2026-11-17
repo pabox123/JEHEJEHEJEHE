@@ -1,6 +1,6 @@
 {
-  "train_size": 480,
-  "test_size": 120,
+  "train_size": 800,
+  "test_size": 200,
   "test_size_ratio": 0.2,
   "random_seed": 42,
   "max_length": 64,
