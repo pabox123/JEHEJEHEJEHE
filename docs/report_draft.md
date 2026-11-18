@@ -32,3 +32,12 @@ To ensure data quality and model performance, we applied a rigorous, multi-step 
 6. **Train/Test Split**: Performed a stratified 80/20 split (800 training samples, 200 testing samples) to maintain the 50/50 class distribution in both sets.
 
 The final processed dataset is stored in the `data/processed/` directory, ensuring a clean separation between raw data and model-ready inputs.
+
+## 4. Baseline Model Results
+To establish a performance floor, we implemented a DummyClassifier using two strategies: 'most_frequent' and 'stratified'. The models were evaluated on the 20% test set (100 comments) using Accuracy, Precision, Recall, F1-Score, and Cohen’s Kappa.
+
+The results are as follows:
+- **Most Frequent Strategy**: Achieved 50.00% Accuracy. Precision, Recall, and F1-Score were 0.0000, as the model predicted only the majority class (or failed to predict the positive class in a perfectly balanced split). Cohen’s Kappa was 0.0000.
+- **Stratified Strategy**: Achieved 50.00% Accuracy, with Precision, Recall, and F1-Score around 0.50. Cohen’s Kappa was 0.0000.
+
+**Interpretation**: A Cohen’s Kappa of 0.0000 is the mathematically expected result for a random-guessing model on a perfectly balanced dataset. It indicates that the model's agreement with the true labels is exactly what would be expected by chance. This establishes the "no-skill" baseline. Any neural architecture (Dense, RNN, LSTM) must significantly exceed 50% Accuracy and 0.00 Kappa to be considered a valid sentiment classifier for this task.
