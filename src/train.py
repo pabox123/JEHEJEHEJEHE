@@ -196,7 +196,16 @@ def train_transformer(
         model.load_state_dict(best_model_state)
 
     return model, history
+def log_hyperparameter_run(params: Dict[str, Any], metrics: Dict[str, float], filepath: str = "logs/hyperparameter_search.csv"):
+    import csv
+    import os
 
+    file_exists = os.path.isfile(filepath)
+    with open(filepath, mode='a', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=list(params.keys()) + list(metrics.keys()))
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow({**params, **metrics})
 
 if __name__ == "__main__":
     from torch.utils.data import Dataset
@@ -241,3 +250,4 @@ if __name__ == "__main__":
     print(f"Training time: {history['training_time']:.2f}s")
     print(f"Train losses: {[f'{x:.4f}' for x in history['train_losses']]}")
     print(f"Val losses: {[f'{x:.4f}' for x in history['val_losses']]}")
+
