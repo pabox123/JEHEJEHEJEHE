@@ -107,5 +107,17 @@ MANUAL ADJUSTMENTS MADE:
 3. Code verification: Verified `cohen_kappa_score` implementation in `src/evaluate.py`.
 ================================================================================
 
+SUMMARY OF AIGen USAGE
+================================================================================
+Total Interactions Logged: 3
+Level of Use: 3 (Collaboration with critical evaluation and refinement)
+Key Contributions of Original Authorship:
+1. Corrected logic in sentiment filtering to ensure "pure" sentiments only.
+2. Customized stopword lists for Reddit-specific noise and GoEmotions mask tokens.
+3. Corrected statistical interpretation of Cohen's Kappa for a balanced baseline.
+Conclusion:
+AIGen tools accelerated boilerplate code and initial drafts, but all outputs were critically evaluated and refined to ensure technical accuracy and conceptual mastery.
+================================================================================
+
 END OF LOG
 ================================================================================
