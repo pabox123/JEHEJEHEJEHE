@@ -17,7 +17,7 @@ contributions and conceptual refinements are traceable.
 | Member | Interaction table | Detailed log |
 | :--- | :--- | :--- |
 | Miguel | [`AIGEN_MIGUEL/AIGen_Interactions.md`](AIGEN_MIGUEL/AIGen_Interactions.md) | [`AIGEN_MIGUEL/prompt_logs.txt`](AIGEN_MIGUEL/prompt_logs.txt) |
-| Valeria | [`AIGEN_VALERIA/AIGen_Interactions.md`](prompts\AIGEN_VALERIA\AIGen_Interacions.md) | [`AIGEN_VALERIA/prompt_logs.txt`](AIGEN_VALERIA/prompt_logs.txt) |
+| Valeria | [`AIGEN_VALERIA/AIGen_Interacions.md`](AIGEN_VALERIA/AIGen_Interacions.md) | [`AIGEN_VALERIA/prompt_logs.txt`](AIGEN_VALERIA/prompt_logs.txt) |
 | Krystal | [`AIGEN_KRYSTAL/AIGen_Interactions.md`](AIGEN_KRYSTAL/AIGen_Interactions.md) | [`AIGEN_KRYSTAL/prompt_logs.txt`](AIGEN_KRYSTAL/prompt_logs.txt) |
 
 ## Document Structure
