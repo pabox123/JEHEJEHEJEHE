@@ -1,1 +1,0 @@
-# AIGen Interactions Log - Team CyED3 (Valeria)
