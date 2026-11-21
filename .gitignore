@@ -60,3 +60,8 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# Context / Rubric files (excluded from tracking)
+IntegrativeTask2-2026-2_CyED3.docx.md
+IntegrativeTask2-2026-2_CyED3.docx (1).md
+2026-2 TI2 - rubricas - Hoja 1.csv
