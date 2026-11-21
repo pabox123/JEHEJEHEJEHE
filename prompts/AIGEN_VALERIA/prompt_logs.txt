@@ -86,3 +86,38 @@ FINAL IMPLEMENTATION:
 - Key improvement: Word clouds now show sentiment-specific vocabulary without
   noise from Reddit platform terms or GoEmotions mask tokens
 ================================================================================
+
+================================================================================
+INTERACTION #3: Baseline Metrics and Kappa Interpretation
+Date: November 19, 2026
+Task: Interpret DummyClassifier metrics for the final report
+================================================================================
+CONTEXT PROVIDED TO AI:
+- Dataset: Balanced 500/500 positive/negative.
+- Metrics: Accuracy ~0.50, Cohen's Kappa ~0.00.
+- Task: Write an academic interpretation of these results.
+PROMPT USED:
+"Write a brief interpretation of these baseline metrics: Accuracy ~0.50, Kappa ~0.00 for a report."
+AI OUTPUT SUMMARY:
+- Described Kappa ~0.00 as "poor agreement" and a "failure to learn".
+- Missed the statistical context of a balanced dummy baseline.
+MANUAL ADJUSTMENTS MADE:
+1. Statistical precision: Corrected the interpretation to state that Kappa ~0.00 is the expected mathematical result for random guessing on a balanced dataset.
+2. Academic framing: Framed the baseline as the "no-skill" floor that neural models must exceed.
+3. Code verification: Verified `cohen_kappa_score` implementation in `src/evaluate.py`.
+================================================================================
+
+SUMMARY OF AIGen USAGE
+================================================================================
+Total Interactions Logged: 3
+Level of Use: 3 (Collaboration with critical evaluation and refinement)
+Key Contributions of Original Authorship:
+1. Corrected logic in sentiment filtering to ensure "pure" sentiments only.
+2. Customized stopword lists for Reddit-specific noise and GoEmotions mask tokens.
+3. Corrected statistical interpretation of Cohen's Kappa for a balanced baseline.
+Conclusion:
+AIGen tools accelerated boilerplate code and initial drafts, but all outputs were critically evaluated and refined to ensure technical accuracy and conceptual mastery.
+================================================================================
+
+END OF LOG
+================================================================================
