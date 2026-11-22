@@ -4,7 +4,7 @@
 
 This project studies binary sentiment classification of Reddit comments from the GoEmotions dataset. The planned comparison includes a dummy baseline, a dense neural network, a vanilla recurrent neural network (RNN), a Long Short-Term Memory (LSTM) network, and a Transformer-based model.
 
-The repository currently contains a data-preparation plan and a working DistilBERT extension. The baseline, dense, RNN, and LSTM notebooks are still placeholders, so no experimental comparison among those models can be reported yet. The project also relates sequence processing and neural memory to Turing Machine concepts, especially state, memory, transitions, and computability.
+The repository includes the full data-preparation and EDA pipeline, the DummyClassifier baselines, the Dense, Vanilla RNN, and tuned LSTM neural models, and the DistilBERT extension, allowing a complete experimental comparison across all architectures. The project also relates sequence processing and neural memory to Turing Machine concepts, especially state, memory, transitions, and computability.
 
 ## 2. Dataset and Experimental Configuration
 

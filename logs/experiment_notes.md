@@ -4,27 +4,45 @@ This log records the experiments that have actually been run, along with decisio
 
   ---
 
+## Exploratory Data Analysis & Dataset Preparation — November 16–17, 2026
+
+Implemented in `notebooks/01_eda.ipynb` and `src/build_dataset.py`.
+
+### Data Pipeline
+- **Source:** Official GoEmotions TSV files (`data/raw/train.tsv`, `dev.tsv`, `test.tsv`)
+- **Filtering:** Retained comments consistently mapped to positive or negative emotion groups, excluding neutral, ambiguous, and mixed comments → **29,991 filtered comments** (9,214 negative, 20,777 positive), saved to `data/processed/filtered_dataset.csv`
+- **Balancing:** Random undersampling with seed `42` → **1,000 comments** (500 negative, 500 positive), saved to `data/processed/balanced_dataset.csv`
+- **Split:** 80/20 stratified split (800 `train.csv` / 200 `test.csv`), seed `42`
+- **Preprocessing:** Lowercasing, punctuation removal, and English stopword removal (`cleaned_text` column)
+
+### Figures Saved
+- `outputs/figures/class_distribution.png`
+- `outputs/figures/text_length_distribution.png`
+- `outputs/figures/top_words.png`
+- `outputs/figures/wordclouds.png`
+
+  ---
+
 ## Dummy Baseline (DummyClassifier) — November 16, 2026
 
 Implemented in `notebooks/02_baseline_model.ipynb` (commit 7be0b1d).
 
 ### Configuration
-- **Model:** `sklearn.dummy.DummyClassifier(strategy="most_frequent")`
+- **Models:** `sklearn.dummy.DummyClassifier(strategy="most_frequent")` and `DummyClassifier(strategy="stratified", random_state=42)`
 - **Data:** Balanced GoEmotions subset (1,000 comments: 500 negative, 500 positive)
 - **Split:** 80/20 stratified (800 train / 200 test), seed 42
 - **Input:** BoW vectors (CountVectorizer, max_features=5000, stopwords EN) — 2,253 dimensions
 
 ### Recorded Result
 `outputs/metrics/baseline_metrics.csv` reports:
-- Accuracy: 0.500
-- Precision: 0.333
-- Recall: 0.500
-- F1-score: 0.400
-- Cohen's Kappa: 0.000
+- **Most Frequent:** Accuracy: `0.500`, Precision: `0.000`, Recall: `0.000`, F1-score: `0.000`, Cohen's Kappa: `0.000`
+- **Stratified:** Accuracy: `0.500`, Precision: `0.500`, Recall: `0.510`, F1-score: `0.505`, Cohen's Kappa: `0.000`
+
+Figure saved:
+- `outputs/figures/confusion_matrix_baseline.png`
 
 ### Interpretation
-The majority-class baseline (always predicts "positive") achieves 50% accuracy but zero kappa, confirming the balanced split. This establishes the floor for all subsequent
-models.
+Both dummy baselines achieve 50% accuracy and zero Cohen's kappa (`0.000`), confirming the balanced 50/50 split and establishing the chance-level floor for all subsequent models.
 
   ---
 
@@ -131,7 +149,7 @@ Manual grid search over 12 combinations (3 hidden_dims × 2 learning_rates × 2 
 
 Best: **hidden_dim=64, lr=0.001, batch_size=32** (F1=0.6923)
 
-Logged to: `logs/hyperparameter_search.csv` (via `src/train.py:log_hyperparameter_run`)
+Grid search results recorded in `notebooks/03_dense_rnn_lstm.ipynb`.
 
 ### Final Retraining (Best Config, 20 epochs, patience 4)
 `outputs/metrics/lstm_tuned_metrics.json`:
@@ -156,13 +174,16 @@ on this data.
 
 ## Model Comparison Summary — November 20, 2026
 
-Consolidated in `outputs/metrics/model_comparison.csv` / `.json` (commit 38f8699).
+Consolidated across `outputs/metrics/baseline_metrics.csv`, `outputs/metrics/model_comparison.csv` / `.json` (commit 38f8699), and `outputs/metrics/transformer_metrics.json`.
 
 | Model | Accuracy | Precision | Recall | F1-Score | Cohen's Kappa |
-  |-------|----------|-----------|--------|----------|---------------|
+|-------|----------|-----------|--------|----------|---------------|
+| Dummy (Most Frequent) | 0.500 | 0.000 | 0.000 | 0.000 | 0.000 |
+| Dummy (Stratified) | 0.500 | 0.500 | 0.510 | 0.505 | 0.000 |
 | Dense NN (BoW) | 0.745 | 0.738 | 0.760 | 0.749 | 0.490 |
 | Vanilla RNN | 0.550 | 0.536 | 0.740 | 0.622 | 0.100 |
 | LSTM (tuned) | 0.525 | 0.520 | 0.660 | 0.582 | 0.050 |
+| DistilBERT (Extension) | 0.775 | 0.762 | 0.800 | 0.780 | 0.550 |
 
 Comparison figures:
 - `outputs/figures/comp_accuracy.png`
@@ -170,8 +191,7 @@ Comparison figures:
 - `outputs/figures/comp_kappa.png`
 - `outputs/figures/model_comparison_accuracy.png`
 
-Key finding: **Dense BoW network is the strongest classical model** — outperforms both sequential models on every metric. Consistent with short GoEmotions comments (≈13 words):
-sentiment carried by keywords, BoW avoids sequential optimization difficulty.
+Key finding: **DistilBERT is the best overall model** (Accuracy 0.775, F1 0.780, Kappa 0.550), while **Dense NN (BoW) is the strongest classical model** — outperforming both sequential models (Vanilla RNN and LSTM) on every metric. Consistent with short GoEmotions comments (≈13 words): sentiment is carried by keywords, and BoW avoids sequential optimization difficulty on small data.
 
   ---
 
@@ -215,11 +235,11 @@ Best overall model (Accuracy 0.775, Kappa 0.550). Result specific to the balance
 ## Reproducibility Notes
 
 - Random seed `42` used for balanced dataset creation and train/test split.
-- Raw data, processed data, and large model weights are **not versioned**.
-- Metrics stored as JSON/CSV in `outputs/metrics/`.
+- Large model weights (`*.pt`, `*.pth`, `*.ckpt`, `*.safetensors`) are **not versioned**.
+- Metrics stored as JSON/CSV in `outputs/metrics/`; tokenization config in `outputs/processed/04_tokenization_config.json`.
 - Generated figures stored as PNG in `outputs/figures/`.
-- Hyperparameter search trail in `logs/hyperparameter_search.csv`.
-- AIGen interaction logs in `prompts/AIGEN_KRYSTAL/`.
+- Training log placeholder in `logs/training_logs.txt`; hyperparameter search details in `notebooks/03_dense_rnn_lstm.ipynb`.
+- AIGen interaction logs indexed in `prompts/Readme.md` (`prompts/AIGEN_MIGUEL/`, `prompts/AIGEN_VALERIA/`, `prompts/AIGEN_KRYSTAL/`).
 
   ---
 
