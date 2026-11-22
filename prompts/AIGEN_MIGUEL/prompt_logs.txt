@@ -531,7 +531,3 @@ GenAI was used to accelerate boilerplate and first drafts. Every output was
 checked against the repository and against the theory covered in Unit 3.
 Where the generated content was wrong, unverifiable or overstated, it was
 corrected or removed, and the correction was recorded in this log.
-
-================================================================================
-END OF LOG
-================================================================================

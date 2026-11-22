@@ -1,2 +1,202 @@
-======================================================
-======================================================
+================================================================================
+CED-III-IT2 — PROMPT LOG (GenAI INTERACTION REGISTER)
+Team: CyED3 | Student: Krystal
+AIGen Tool: Qwen | Level of Use: Collaboration with GenAI
+================================================================================
+
+================================================================================
+INTERACTION #1: Role Definition and Modular Architecture for the Neural Models
+Date: November 14, 2026
+Task: Clarify my implementation responsibility and design the module structure
+      for the Dense NN, vanilla RNN, and LSTM models
+================================================================================
+CONTEXT PROVIDED TO AI:
+- Statement requires: Dense NN, vanilla RNN, and LSTM for binary sentiment
+  classification, trained and tuned with a shared routine
+- Repository structure mandates: src/models.py (architectures),
+  src/train.py (training logic), src/evaluate.py (metrics)
+- Team of 3: I implement the core recurrent/dense models, Miguel handles the
+  Transformer extension, Valeria the baseline/EDA
+- All models must consume the same balanced 500/500 dataset (80/20 split,
+  800 train / 200 test) and identical batch format
+PROMPT USED:
+"I am responsible for implementing the three core neural models (Dense NN,
+vanilla RNN, and LSTM) for our GoEmotions sentiment analysis project. Before
+starting, what is my specific role in this project, what is expected of me,
+and how does my work impact my teammates? What part of my implementation do
+you think will be the most challenging?"
+AI OUTPUT SUMMARY:
+- Defined my role as "The Core" of the implementation (DenseNN, RNN, LSTM)
+- Warned that Miguel's Transformer notebook and the comparative analysis would
+  depend directly on my classes and training loop being importable and clean
+- Identified data formatting/shape mismatches and overfitting as the two main
+  technical challenges
+MANUAL ADJUSTMENTS MADE:
+1. Modular Architecture: Following the AI's dependency warning, I strictly
+   separated model definitions (src/models.py: DenseNN, VanillaRNN,
+   LSTMClassifier as pure nn.Module classes) from training logic
+   (src/train.py: train_model with BCEWithLogitsLoss, Adam, and early
+   stopping). This allowed Miguel to import my classes and the shared routine
+   directly in his transformer notebook without duplicating any code.
+2. Custom Datasets for a Unified Batch Contract: I designed a
+   SentimentDataset class that returns dictionary-style batches
+   {"input_ids": ..., "labels": ...}, matching the key names the shared
+   training loop expects. For the recurrent models I built SequenceDataset
+   with left-padding to MAX_SEQ_LEN=30 (PAD_IDX=0) and vocabulary reuse from
+   the CountVectorizer, so the Dense, RNN and LSTM loaders all produce
+   batches with identical keys.
+3. Architecture decisions that were MY OWN, not the AI's: bidirectional
+   2-layer LSTM with layer dropout 0.3 (embedding 64 / hidden 128) to combat
+   the vanishing-gradient problem; a deliberately shallow 1-layer
+   bidirectional VanillaRNN to serve as a clean ablation against the LSTM;
+   a configurable ReLU/Linear stack with dropout 0.3 for the DenseNN.
+FINAL IMPLEMENTATION:
+- Files: src/models.py, src/train.py, notebooks/03_dense_rnn_lstm.ipynb
+- Key classes: DenseNN, VanillaRNN, LSTMClassifier (models.py);
+  train_model() (train.py); SentimentDataset / SequenceDataset (notebook)
+================================================================================
+
+================================================================================
+INTERACTION #2: Verifying the Early-Stopping and State-Restoration Logic
+Date: November 16, 2026
+Task: Validate the training routine on dummy data before touching the real
+      1,000-comment dataset
+================================================================================
+CONTEXT PROVIDED TO AI:
+- I ran the __main__ block of src/train.py against a DummyDataset
+  (100 train / 30 val samples, seq_len=20, vocab_size=1000) with an
+  LSTMClassifier (embedding_dim=32, hidden_dim=64, num_layers=1)
+- Training stopped at epoch 3 due to the patience counter (patience=2)
+- Pasted the printed history: validation loss INCREASING (0.73 -> 0.96)
+  across epochs
+PROMPT USED:
+"I'm testing my training routine. The training stopped at epoch 3 with an
+increasing validation loss. Are these results correct, or is my early
+stopping broken?"
+AI OUTPUT SUMMARY:
+- Confirmed the early-stopping logic is working as designed
+- Explained that a monotonically increasing validation loss on a tiny random
+  synthetic dataset indicates overfitting, which correctly triggered the
+  patience counter and stopped the loop
+MANUAL ADJUSTMENTS MADE:
+1. State Restoration Verification: I did not trust the explanation alone. I
+   manually inspected best_model_state in the debugger and confirmed that
+   (a) the weights of the epoch with the lowest validation loss are saved via
+   copy.deepcopy(model.state_dict()), and (b) model.load_state_dict()
+   actually restores those weights at the end of training — the evaluation
+   therefore uses the best checkpoint, not the last epoch.
+2. Instrumentation for the Comparative Deliverable: I extended the returned
+   history dictionary to expose "training_time" and "epochs_run", since the
+   report requires comparing training complexity across all models.
+3. Robustness fix: I guarded the loss averages with max(n_batches, 1) to
+   prevent ZeroDivisionError when a dataset produces fewer batches than the
+   batch size on the final partial iteration.
+FINAL IMPLEMENTATION:
+- File: src/train.py
+- Function: train_model() returning {train_losses, val_losses,
+  best_val_loss, epochs_run, training_time, best_model_state}
+- Verified in the notebook outputs (e.g., DenseNN trained with patience=4,
+  early-stopped cleanly before overfitting degraded test performance)
+================================================================================
+
+================================================================================
+INTERACTION #3: Debugging Terrible Metrics on the Evaluation Module
+Date: November 16, 2026
+Task: Validate src/evaluate.py metric computation and prediction pipeline
+================================================================================
+CONTEXT PROVIDED TO AI:
+- Evaluation of a randomly-initialized (untrained) model on the dummy dataset
+- Reported metrics: Accuracy = 0.32, Cohen's Kappa = -0.25
+- My models use a SINGLE logit output head trained with BCEWithLogitsLoss
+  (not 2-class softmax)
+PROMPT USED:
+"My evaluation metrics look terrible (Accuracy: 0.32, Kappa: -0.25). Is this
+because I'm using dummy data, or is my code broken?"
+AI OUTPUT SUMMARY:
+- Explained that a negative Cohen's Kappa is mathematically expected for an
+  untrained model producing quasi-random predictions (agreement worse than
+  chance is the normal behavior of a random classifier)
+- Verified that the confusion-matrix arithmetic itself was consistent
+MANUAL ADJUSTMENTS MADE:
+1. Logit-to-Prediction Logic and Tensor Verification: I reviewed the
+   evaluation code line by line and confirmed the model's raw logits are
+   converted with torch.sigmoid() >= 0.5. I caught and corrected a draft
+   version that assumed argmax over 2-class logits, which is WRONG for my
+   single-logit architecture — this fix was mine, not the AI's.
+2. Edge Case Handling: I added zero_division=0 to the sklearn
+   precision/recall/F1 calls so that degenerate early-training states
+   (model predicting only one class) do not emit runtime warnings, and I
+   normalized label shapes with labels.unsqueeze(1) before comparison.
+3. Output Format: I structured print_metrics() to display exactly the five
+   metrics required by the rubric (accuracy, precision, recall, F1, kappa)
+   plus the confusion matrix, in the same layout reused across all models.
+FINAL IMPLEMENTATION:
+- File: src/evaluate.py
+- Functions: evaluate_model() and print_metrics()
+- Validated on real data after pipeline check: DenseNN (BoW) reached
+  Accuracy 0.745 / Kappa 0.49, confirming the evaluator works correctly on a
+  trained model
+================================================================================
+
+================================================================================
+INTERACTION #4: Hyperparameter Tuning Strategy for the LSTM
+Date: November 19, 2026
+Task: Implement a search over hidden dimension, learning rate, and batch size
+      for the best-performing recurrent architecture (LSTM)
+================================================================================
+CONTEXT PROVIDED TO AI:
+- Search space: hidden_dims = [64, 128, 256], learning_rates = [0.001,
+  0.0005], batch_sizes = [32, 64] (12 combinations)
+- Models are custom PyTorch with a shared training loop that includes early
+  stopping and best-state restoration
+- Constraint: training on CPU-only hardware (no CUDA), so the search must
+  bound total wall-clock cost
+- Requirement: log every run's metrics and select the configuration for a
+  final full training
+PROMPT USED:
+"What is the best way to implement GridSearch for my PyTorch models? Should
+I use Scikit-learn's GridSearchCV or a manual approach?"
+AI OUTPUT SUMMARY:
+- Recommended a manual nested-loop search inside the notebook
+- Explained that wrapping custom PyTorch models with early stopping in
+  sklearn's GridSearchCV requires fragile estimator wrappers that are prone
+  to shape and state bugs
+- Suggested evaluating each combination and tracking the metric of interest
+MANUAL ADJUSTMENTS MADE:
+1. Implementation Strategy: I agreed with the manual approach (itertools.product
+   over the three hyperparameter axes inside 03_dense_rnn_lstm.ipynb) but
+   refined it by creating a dedicated log_hyperparameter_run() function in
+   src/train.py that appends every (params + metrics) row to a persistent
+   CSV file, instead of the AI's in-memory-only suggestion. This gives an
+   auditable experiment trail.
+2. Metric Selection: Instead of the accuracy-only ranking the AI proposed, I
+   configured the loop to track F1-score AND Cohen's kappa, sorting by F1 —
+   a better balance for sentiment classification since both classes have
+   equal support in the test split.
+3. Cost Control: I limited each tuning run to 10 epochs with patience=3,
+   then retrained the winner (hidden_dim=64, lr=0.001, batch_size=32,
+   best F1 = 0.6923) with the full 20-epoch budget.
+4. Critical Analysis of an Unstable Result: the final retraining collapsed to
+   Accuracy 0.525 / Kappa 0.05 despite the best search score. Rather than
+   hiding it, I diagnosed it as a consequence of early stopping restoring a
+   weak checkpoint on this small dataset, documented the limitation honestly
+   in the comparative table, and reported it as evidence that the tuned LSTM
+   underperformed the DenseNN baseline on this data.
+5. Visualization: I added a seaborn barplot (F1 vs hidden_dim, hue=lr) so the
+   tuning landscape can be inspected visually in the report.
+FINAL IMPLEMENTATION:
+- Files: src/train.py (log_hyperparameter_run),
+  notebooks/03_dense_rnn_lstm.ipynb (grid-search cells),
+  logs/hyperparameter_search.csv, outputs/metrics/lstm_tuned_metrics.json,
+  outputs/metrics/model_comparison.csv / .json
+================================================================================
+
+--------------------------------------------------------------------------------
+SUMMARY
+Total logged interactions: 4 (covering 14-Nov through 19-Nov-2026)
+Main deliverables impacted: src/models.py, src/train.py, src/evaluate.py,
+notebooks/03_dense_rnn_lstm.ipynb, outputs/metrics/
+Conceptual ownership: architecture design, sigmoid/threshold logic,
+early-stopping verification, F1-based model selection, and the critical
+discussion of the tuning instability were performed or corrected by me.
+--------------------------------------------------------------------------------

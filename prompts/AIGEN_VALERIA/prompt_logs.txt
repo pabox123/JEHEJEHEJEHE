@@ -117,7 +117,4 @@ Key Contributions of Original Authorship:
 3. Corrected statistical interpretation of Cohen's Kappa for a balanced baseline.
 Conclusion:
 AIGen tools accelerated boilerplate code and initial drafts, but all outputs were critically evaluated and refined to ensure technical accuracy and conceptual mastery.
-================================================================================
 
-END OF LOG
-================================================================================

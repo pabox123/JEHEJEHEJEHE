@@ -2,7 +2,7 @@
 # AIGen Interactions Log - Team CyED3 (Valeria)
 
 **Project:** CED-III-IT2 - Sentiment Analysis on GoEmotions  
-**Student:** Valeria  
+**Student:** ValeriaA  
 **AIGen Tool Used:** Qwen  
 **Level of Use:** 3 - Collaboration with GenAI (critique, adjustment and refinement of outputs)
 
