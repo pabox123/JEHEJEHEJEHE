@@ -6,9 +6,9 @@ Academic machine learning project for sentiment analysis using a balanced subset
 
 ## Team Members
 
-- Valeria
-- Krystal
-- Miguel
+- Valeria Piza Saavedra - A00405037
+- Krystal Angely Giraldo Ramirez - A00407967
+- Miguel Jose Pabon Benavidez - A00406585
 
 ## Status: In Progress
 
