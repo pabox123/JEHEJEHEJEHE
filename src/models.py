@@ -160,9 +160,8 @@ if __name__ == "__main__":
     lstm_output = lstm_model(lstm_input)
     print(f"Input shape : {lstm_input.shape}")
     print(f"Output shape: {lstm_output.shape}")
-    print(f"Input shape : {dummy_input.shape}")
-    print(f"Output shape: {output.shape}")
-    print(f"Model:\n{model}")
+
+
 from transformers import DistilBertModel
 
 

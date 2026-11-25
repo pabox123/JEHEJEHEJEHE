@@ -12,6 +12,7 @@ from sklearn.metrics import (
     f1_score,
     cohen_kappa_score,
     confusion_matrix,
+    classification_report,
 )
 from typing import Dict, Any
 

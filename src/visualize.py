@@ -140,9 +140,9 @@ if __name__ == "__main__":
     )
 
     models_metrics = {
-        "DenseNN": {"accuracy": 0.78, "f1": 0.76, "kappa": 0.56},
-        "VanillaRNN": {"accuracy": 0.82, "f1": 0.80, "kappa": 0.64},
-        "LSTM": {"accuracy": 0.87, "f1": 0.85, "kappa": 0.74},
+        "DenseNN": {"accuracy": 0.745, "f1": 0.749, "kappa": 0.490},
+        "VanillaRNN": {"accuracy": 0.550, "f1": 0.622, "kappa": 0.100},
+        "LSTM (Tuned)": {"accuracy": 0.525, "f1": 0.582, "kappa": 0.050},
     }
 
     plot_model_comparison(

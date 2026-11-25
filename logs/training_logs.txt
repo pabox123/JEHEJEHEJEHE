@@ -1,1 +1,66 @@
-Training logs will be filled during model training.
+================================================================================
+CED-III-IT2 — CONSOLIDATED TRAINING & HYPERPARAMETER TUNING LOGS
+Dataset: GoEmotions Balanced Subset (1,000 samples: 800 Train / 200 Test, seed=42)
+Device: CPU (PyTorch 2.x)
+================================================================================
+
+[1] DUMMY BASELINE (notebooks/02_baseline_model.ipynb)
+--------------------------------------------------------------------------------
+Input: Bag-of-Words (CountVectorizer, max_features=5000, stop_words='english') -> 2,253 features
+- Strategy: most_frequent | Acc: 0.5000 | Prec: 0.0000 | Rec: 0.0000 | F1: 0.0000 | Kappa: 0.0000 | CM: [[100, 0], [100, 0]]
+- Strategy: stratified    | Acc: 0.5000 | Prec: 0.5000 | Rec: 0.5100 | F1: 0.5050 | Kappa: 0.0000 | CM: [[49, 51], [49, 51]]
+
+[2] DENSE NEURAL NETWORK — BoW (notebooks/03_dense_rnn_lstm.ipynb)
+--------------------------------------------------------------------------------
+Architecture: Linear(2253->256) + ReLU + Dropout(0.3) -> Linear(256->128) + ReLU + Dropout(0.3) -> Linear(128->1)
+Config: Optimizer=Adam, lr=0.001, batch_size=64, max_epochs=20, early_stopping_patience=4
+- Stopped at Epoch 8 (Best Validation Loss: 0.5469 at Epoch 4, weights restored)
+- Test Metrics: Accuracy=0.7450 | Precision=0.7379 | Recall=0.7600 | F1=0.7488 | Kappa=0.4900
+- Confusion Matrix: [[73, 27], [24, 76]]
+
+[3] BIDIRECTIONAL VANILLA RNN (notebooks/03_dense_rnn_lstm.ipynb)
+--------------------------------------------------------------------------------
+Architecture: Embedding(2254, 64) -> 1-layer Bi-RNN(hidden_dim=128) -> Dropout(0.3) -> Linear(256->1)
+Config: seq_len=30 (left-padded), Optimizer=Adam, lr=0.001, batch_size=64, max_epochs=15, patience=3
+- Stopped at Epoch 12 (Best Validation Loss: 0.6720 at Epoch 9, weights restored)
+- Test Metrics: Accuracy=0.5500 | Precision=0.5362 | Recall=0.7400 | F1=0.6218 | Kappa=0.1000
+- Confusion Matrix: [[36, 64], [26, 74]]
+
+[4] STACKED BIDIRECTIONAL LSTM & GRID SEARCH (notebooks/03_dense_rnn_lstm.ipynb)
+--------------------------------------------------------------------------------
+Initial Run (hidden_dim=128, num_layers=2, bidirectional=True, lr=0.001, batch_size=64, max_epochs=15, patience=3):
+- Stopped at Epoch 9 (Best Validation Loss: 0.6502 at Epoch 6)
+- Initial Test Metrics: Accuracy=0.5550 | Precision=0.5797 | Recall=0.4000 | F1=0.4734 | Kappa=0.1100 | CM: [[71, 29], [60, 40]]
+
+Hyperparameter Grid Search (12 Combinations, 10 epochs each, patience=3, ranked by F1):
+  1. hd=64,  lr=0.0010, bs=32 -> Acc: 0.6800 | F1: 0.6923 | Kappa:  0.3600  [BEST]
+  2. hd=128, lr=0.0005, bs=32 -> Acc: 0.6650 | F1: 0.6633 | Kappa:  0.3300
+  3. hd=256, lr=0.0005, bs=64 -> Acc: 0.4950 | F1: 0.6599 | Kappa: -0.0100
+  4. hd=128, lr=0.0010, bs=64 -> Acc: 0.5350 | F1: 0.6593 | Kappa:  0.0700
+  5. hd=256, lr=0.0005, bs=32 -> Acc: 0.6500 | F1: 0.6354 | Kappa:  0.3000
+  6. hd=256, lr=0.0010, bs=64 -> Acc: 0.5350 | F1: 0.6076 | Kappa:  0.0700
+  7. hd=64,  lr=0.0005, bs=64 -> Acc: 0.5950 | F1: 0.6010 | Kappa:  0.1900
+  8. hd=128, lr=0.0005, bs=64 -> Acc: 0.5200 | F1: 0.6000 | Kappa:  0.0400
+  9. hd=256, lr=0.0010, bs=32 -> Acc: 0.6250 | F1: 0.5856 | Kappa:  0.2500
+ 10. hd=64,  lr=0.0010, bs=64 -> Acc: 0.6300 | F1: 0.5647 | Kappa:  0.2600
+ 11. hd=128, lr=0.0010, bs=32 -> Acc: 0.5800 | F1: 0.5625 | Kappa:  0.1600
+ 12. hd=64,  lr=0.0005, bs=32 -> Acc: 0.5900 | F1: 0.4938 | Kappa:  0.1800
+
+Final Tuned Retraining (hd=64, lr=0.001, bs=32, max_epochs=20, patience=4):
+- Test Metrics (saved to outputs/metrics/lstm_tuned_metrics.json):
+  Accuracy=0.5250 | Precision=0.5197 | Recall=0.6600 | F1=0.5815 | Kappa=0.0500
+- Confusion Matrix: [[39, 61], [34, 66]]
+
+[5] TRANSFORMER EXTENSION — DISTILBERT (notebooks/04_transformer_extension.ipynb)
+--------------------------------------------------------------------------------
+Backbone: distilbert-base-uncased | Tokenizer: DistilBertTokenizerFast (max_length=64)
+Config: Optimizer=AdamW, lr=2e-5, batch_size=16, epochs=5, max_grad_norm=1.0
+- Epoch 1/5 | Train Loss: 0.6742 | Train Acc: 0.5675 | Val Loss: 0.6036 | Val Acc: 0.6950 -> saved best
+- Epoch 2/5 | Train Loss: 0.4873 | Train Acc: 0.7825 | Val Loss: 0.5072 | Val Acc: 0.7400 -> saved best
+- Epoch 3/5 | Train Loss: 0.3180 | Train Acc: 0.8775 | Val Loss: 0.5955 | Val Acc: 0.7500 -> saved best
+- Epoch 4/5 | Train Loss: 0.1833 | Train Acc: 0.9375 | Val Loss: 0.6329 | Val Acc: 0.7450
+- Epoch 5/5 | Train Loss: 0.0890 | Train Acc: 0.9788 | Val Loss: 0.8308 | Val Acc: 0.7750 -> saved best
+- Final Test Metrics (saved to outputs/metrics/transformer_metrics.json):
+  Accuracy=0.7750 | Precision=0.7619 | Recall=0.8000 | F1=0.7805 | Kappa=0.5500
+- Confusion Matrix: [[75, 25], [20, 80]]
+================================================================================
